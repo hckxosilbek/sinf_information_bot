@@ -2,15 +2,15 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-# Database obyekti joylashuvini moslang (masalan: database/db.py bo'lsa)
-from database.db import db  
+# Baza funksiyalarini database.db faylidan import qilamiz
+from database.db import get_all_class_files, get_file_by_id
 
 router = Router()
 
 # "Sinf Fayllari" tugmasi bosilganda
 @router.message(F.text.in_(["📦 Sinf Fayllari", "Sinf Fayllari", "class_file"]))
 async def show_class_files(message: Message):
-    files = await db.get_all_class_files() 
+    files = await get_all_class_files() 
     
     if not files:
         await message.answer("📁 Hozircha hech qanday fayl mavjud emas.")
@@ -39,7 +39,7 @@ async def show_class_files(message: Message):
 @router.callback_query(F.data.startswith("show_file_"))
 async def send_selected_file(call: CallbackQuery):
     file_db_id = int(call.data.split("_")[2])
-    file_data = await db.get_file_by_id(file_db_id)
+    file_data = await get_file_by_id(file_db_id)
     
     if not file_data:
         await call.answer("❌ Fayl topilmadi!", show_alert=True)
