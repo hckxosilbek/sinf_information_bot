@@ -1,14 +1,12 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-# Baza funksiyalarini database.db faylidan import qilamiz
 from database.db import get_all_class_files, get_file_by_id
 
 router = Router()
 
-# "Sinf Fayllari" tugmasi bosilganda
-@router.message(F.text.in_(["📦 Sinf Fayllari", "Sinf Fayllari", "class_file"]))
+# "sinf" yoki "fayl" so'zi bo'lgan har qanday xabarni ushlab qoladi
+@router.message(F.text.func(lambda text: text and ("sinf" in text.lower() or "fayl" in text.lower())))
 async def show_class_files(message: Message):
     files = await get_all_class_files() 
     
@@ -20,7 +18,7 @@ async def show_class_files(message: Message):
     
     for file in files:
         file_id = file[0]
-        file_title = file[1]
+        file_title = file[1]  # Masalan: "olimlar bilan tanishuv", "Xphoto"
         
         builder.button(
             text=f"📄 {file_title}", 
@@ -30,12 +28,12 @@ async def show_class_files(message: Message):
     builder.adjust(1)
 
     await message.answer(
-        "📂 **Sinf fayllari ro'yxati:**\n\nKerakli faylni ko'rish uchun quyidagi tugmalardan birini bosing:",
+        "📂 **Sinf fayllari ro'yxati:**\n\nRasmni ko'rish uchun kerakli fayl nomini bosing:",
         reply_markup=builder.as_markup(),
         parse_mode="Markdown"
     )
 
-# Tugmalardan biri bosilganda faylni yuborish
+# Inline tugma bosilganda aynan o'sha rasmni chiqarish
 @router.callback_query(F.data.startswith("show_file_"))
 async def send_selected_file(call: CallbackQuery):
     file_db_id = int(call.data.split("_")[2])

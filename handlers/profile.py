@@ -25,14 +25,23 @@ async def process_category(callback: CallbackQuery, db_user):
         await callback.answer("Bu bo'limda hozircha fayllar yo'q.", show_alert=True)
         return
         
-    await callback.message.answer(f"📦 Tanlangan bo'lim: {category}")
-    for f in files:
-        try:
-            await callback.message.answer_document(f['file_id'], caption=f['title'])
-        except Exception:
-            try:
-                await callback.message.answer_photo(f['file_id'], caption=f['title'])
-            except:
-                pass
+    from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+    builder = InlineKeyboardBuilder()
     
-    await callback.answer()
+    for f in files:
+        # Har bir fayl uchun alohida tugma yaratamiz
+        builder.button(
+            text=f"📄 {f['title']}", 
+            callback_data=f"show_file_{f['id']}"
+        )
+    
+    builder.adjust(1)  # Tugmalarni ustma-ust taxlash
+
+    await callback.message.answer(
+        f"📦 **Tanlangan bo'lim: {category}**\n\nKo'rmoqchi bo'lgan faylingizni tanlang:",
+        reply_markup=builder.as_markup(),
+        parse_mode="Markdown"
+    )
+    
+    
