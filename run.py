@@ -30,11 +30,11 @@ async def main():
     dp.update.outer_middleware(WhitelistMiddleware())
 
     # Routerlarni ulash
+    dp.include_router(class_files.router)
     dp.include_router(start.router)
     dp.include_router(admin.router)
     dp.include_router(search.router)
     dp.include_router(profile.router)
-    dp.include_router(class_files.router)
 
     await dp.start_polling(bot)
 
