@@ -108,3 +108,37 @@ async def process_file_user_id(message: Message, state: FSMContext):
 async def cancel_action(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.edit_text("❌ Amal bekor qilindi.")
+import sqlite3
+from aiogram import Bot, Router
+from aiogram.filters import Command
+from aiogram.types import Message
+
+router = Router()
+
+# O'zingizning Telegram admin ID raqamingizni yozing
+ADMIN_ID = 123456789  # <-- O'z ID raqamingizni qo'ying
+
+
+@router.message(Command("users"))
+async def get_total_users(message: Message):
+  # Xohlasangiz, bu buyruq faqat sizga (aminga) ishlashi uchun shart qo'shamiz:
+  if message.from_user.id != ADMIN_ID:
+    await message.answer("Bu buyruq faqat admin uchun!")
+    return
+
+  # Ma'lumotlar bazasiga ulanish (loyihangizdagi bazaga qarab yo'lini o'zgartiring)
+  conn = sqlite3.connect("database.sqlite")  # yoki bazangiz nomi
+  cursor = conn.cursor()
+
+  try:
+    # Bazadan foydalanuvchilar sonini sanab olish
+    cursor.execute("SELECT COUNT(*) FROM users")
+    count = cursor.fetchone()[0]
+    await message.answer(f"👥 Botdagi jami foydalanuvchilar soni: {count} ta")
+  except Exception as e:
+    await message.answer(
+        "Foydalanuvchilarni sanashda xatolik yuz berdi (baza yoki"
+        " jadval topilmadi)."
+    )
+  finally:
+    conn.close()

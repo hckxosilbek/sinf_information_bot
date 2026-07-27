@@ -80,12 +80,12 @@ async def get_files_by_category_and_user(category: str, user_id: int = None):
             query = 'SELECT * FROM files WHERE category = ? AND user_id IS NULL'
             async with db.execute(query, (category,)) as cursor:
                 return await cursor.fetchall()
-async def get_all_class_files():
+async def get_all_files():
     async with aiosqlite.connect(DB_NAME) as db:
-        async with db.execute("SELECT id, title FROM class_files") as cursor:
+        async with db.execute("SELECT id, title FROM files") as cursor:
             return await cursor.fetchall()
 
 async def get_file_by_id(file_id: int):
     async with aiosqlite.connect(DB_NAME) as db:
-        async with db.execute("SELECT id, title, file_id, file_type FROM class_files WHERE id = ?", (file_id,)) as cursor:
+        async with db.execute("SELECT id, title, file_id,title FROM files WHERE id = ?", (file_id,)) as cursor:
             return await cursor.fetchone()

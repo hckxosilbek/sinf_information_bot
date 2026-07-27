@@ -39,9 +39,9 @@ async def process_category(callback: CallbackQuery, db_user):
     builder.adjust(1)  # Tugmalarni ustma-ust taxlash
 
     await callback.message.answer(
-        f"📦 **Tanlangan bo'lim: {category}**\n\nKo'rmoqchi bo'lgan faylingizni tanlang:",
-        reply_markup=builder.as_markup(),
-        parse_mode="Markdown"
-    )
+    f"📦 <b>Tanlangan bo'lim: {category}</b>\n\nKo'rmoqchi bo'lsangiz faylingizni tanlang:",
+    reply_markup=builder.as_markup(),
+    parse_mode="HTML"  # HTML da pastki chiziqlar (_ or class_file) xatolik bermaydi
+)
     
     
